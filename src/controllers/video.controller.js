@@ -7,14 +7,43 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
-  //TODO: get all videos based on query, sort, pagination
-  const videos = await Video.find();
+  let { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, videos, "All videos fetched successfully"));
+  // Convert page and limit to numbers
+  page = parseInt(page);
+  limit = parseInt(limit);
+
+  // Construct query filter based on userId and query
+  const filters = {};
+  if (userId) {
+    filters.userId = userId;
+  }
+  if (query) {
+    // Example: search by title or description
+    filters.$or = [
+      { title: { $regex: query, $options: 'i' } },
+      { description: { $regex: query, $options: 'i' } },
+    ];
+  }
+
+  // Construct sort options
+  const sortOptions = {};
+  if (sortBy) {
+    sortOptions[sortBy] = sortType === 'desc' ? -1 : 1;
+  } else {
+    // Default sorting by createdAt, descending
+    sortOptions.createdAt = -1;
+  }
+
+  // Fetch videos with pagination and sorting
+  const videos = await Video.find(filters)
+    .sort(sortOptions)
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  return res.status(200).json(new ApiResponse(200, videos, "All videos fetched successfully"));
 });
+
 
 const publishAVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body;
