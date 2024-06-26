@@ -9,18 +9,80 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const {videoId} = req.params
     const {page = 1, limit = 10} = req.query
 
+    const comments = await Comment.find({video:videoId});
+    
+    return res
+    .status(200)
+    .json(new ApiResponse(
+        200,
+        comments,
+        "Comments fetched successfully"
+    ))
 })
 
 const addComment = asyncHandler(async (req, res) => {
     // TODO: add a comment to a video
+    const user = req.user;
+    const { content } = req.body;
+    const {videoId} = req.params;
+
+    if(!content){
+        throw new ApiError(400, "content is required")
+    }
+
+    const comment = await Comment.create({
+        user:user._id,
+        content,
+        video:videoId
+    })
+    return res
+    .status(200)
+    .json(new ApiResponse(
+        200,
+        comment,
+        "Comment added successfully"
+    ))
 })
 
 const updateComment = asyncHandler(async (req, res) => {
     // TODO: update a comment
+    const {commentId} = req.params;
+    const {content} = req.body;
+
+    if(!content){
+        throw new ApiError(400, "content is required")
+    }
+
+    const comment = await Comment.findByIdAndUpdate(commentId,{
+        $set:{
+            content
+        }
+    },{
+        new:true
+    })
+
+    return res
+    .status(200)
+    .json(new ApiResponse(
+        200,
+        comment,
+        "Comment updated successfully"
+    ))
 })
 
 const deleteComment = asyncHandler(async (req, res) => {
     // TODO: delete a comment
+    const {commentId} = req.params;
+
+    const comment = await Comment.findByIdAndDelete(commentId);
+
+    return res
+    .status(200)
+    .json(new ApiResponse(
+        200,
+        comment,
+        "Comment deleted successfully"
+    ))
 })
 
 export {
