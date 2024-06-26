@@ -80,35 +80,33 @@ const updateVideo = asyncHandler(async (req, res) => {
   //TODO: update video details like title, description, thumbnail
   const { title, description } = req.body;
 
-  const thumbnailLocalPath = req.file?.path
+  const thumbnailLocalPath = req.file?.path;
 
-    if (!thumbnailLocalPath || !title || !description) {
-        throw new ApiError(400, "all fields are required");
-    }
+  if (!thumbnailLocalPath || !title || !description) {
+    throw new ApiError(400, "all fields are required");
+  }
 
-    const thumbnail = await uploadOnCloudinary(thumbnailLocalPath)
+  const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
 
-    if (!thumbnail.url) {
-        throw new ApiError(400, "Error while uploading on avatar")
-        
-    }
+  if (!thumbnail.url) {
+    throw new ApiError(400, "Error while uploading on avatar");
+  }
 
-    const video = await Video.findByIdAndUpdate(
-        videoId,
-        {
-            $set:{
-                title,
-                description,
-                thumbnail: thumbnail.url
-            }
-        },
-        {new: true}
-    )
+  const video = await Video.findByIdAndUpdate(
+    videoId,
+    {
+      $set: {
+        title,
+        description,
+        thumbnail: thumbnail.url,
+      },
+    },
+    { new: true }
+  );
 
   return res
     .status(200)
     .json(new ApiResponse(200, video, "Video updated successfully"));
-
 });
 
 const deleteVideo = asyncHandler(async (req, res) => {
@@ -118,7 +116,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
     throw new ApiError(400, "video id is required");
   }
 
-const video = await Video.findByIdAndDelete(videoId);
+  const video = await Video.findByIdAndDelete(videoId);
 
   return res
     .status(200)
@@ -133,9 +131,11 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
 
   const video = await Video.findByIdAndUpdate(
     videoId,
-    [{
-      $set: { isPublished: { $eq: [false, "$isPublished"] } },
-    }],
+    [
+      {
+        $set: { isPublished: { $eq: [false, "$isPublished"] } },
+      },
+    ],
     { new: true }
   );
 
