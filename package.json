@@ -1,18 +1,13 @@
 {
-  "name": "chai-backend",
+  "name": "watchnowbackend",
   "version": "1.0.0",
-  "description": "a backend at chai aur code channel - youtube",
+  "description": "",
   "type": "module",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
-  "keywords": [
-    "javascript",
-    "backend",
-    "chai"
-  ],
-  "author": "Hitesh Choudhary",
+  "author": "sachin_chauhan",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^3.0.1",
