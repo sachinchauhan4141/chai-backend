@@ -23,14 +23,14 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
 // Fetch subscriber list of a channel with detailed information
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
-  const { channelId } = req.params;
+  const { subscriberId } = req.params;
 
-  if (!isValidObjectId(channelId)) {
+  if (!isValidObjectId(subscriberId)) {
     throw new ApiError(400, "Invalid channelId");
   }
 
   const subscribers = await Subscription.aggregate([
-    { $match: { channelId: channelId } },
+    { $match: { subscriberId: subscriberId } },
     {
       $lookup: {
         from: "users",
@@ -56,14 +56,14 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 
 // Fetch channel list to which a user has subscribed along with video counts
 const getSubscribedChannels = asyncHandler(async (req, res) => {
-  const { userId } = req.params;
+  const { channelId } = req.params;
 
-  if (!isValidObjectId(userId)) {
+  if (!isValidObjectId(channelId)) {
     throw new ApiError(400, "Invalid userId");
   }
 
   const channels = await Subscription.aggregate([
-    { $match: { userId: userId } },
+    { $match: { channelId: channelId } },
     {
       $lookup: {
         from: "users",
